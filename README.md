@@ -43,8 +43,8 @@ clear terminal text
 
 usage:
 ```python
-clear    // no () needed
-cls    // alias of clear
+clear    # no () needed
+cls    # alias of clear
 ```
 
 
@@ -53,8 +53,8 @@ cls    // alias of clear
 show/change working directory
 
 ```python
-chdir          // print current path, no () needed
-chdir(dest)    // change working directory to dest
+chdir          # print current path, no () needed
+chdir(dest)    # change working directory to dest
 ```
 
 
@@ -63,16 +63,16 @@ chdir(dest)    // change working directory to dest
 show directory files
 
 ```python
-list_dir        // show all files in current directory
-list_dir(path)  // show all files in path
+list_dir        # show all files in current directory
+list_dir(path)  # show all files in path
 ```
 
 
 **list_tree**
 
 ```python
-list_tree        // show files tree in current directory
-list_tree(path)  // show files tree in path
+list_tree        # show files tree in current directory
+list_tree(path)  # show files tree in path
 ```
 
 
@@ -81,9 +81,9 @@ list_tree(path)  // show files tree in path
 load opencv2.VideoCapture from file path or explorer select
 
 ```python
-video: cv2.VideoCapture = load_video(path);  // open file in `path`
+video: cv2.VideoCapture = load_video(path);  # open file in `path`
 
-video: cv2.VideoCapture = load_video();      // ask user file by open an exploer and open it
+video: cv2.VideoCapture = load_video();      # ask user file by open an exploer and open it
 ```
 - path : video path in str, or open explorer to select if None
 
@@ -126,15 +126,15 @@ valid = is_valid_video(video);
 make GIF
 
 ```python
-// == constants ==
+# == constants ==
 FOLDER = "frames/";
 DURATION = 1000 / 25;
 LOOP = 0;
 
-// == useway 1 ==
+# == useway 1 ==
 write_images_to_gif(FOLDER, "output.gif", DURATION, LOOP);
 
-// == useway 2 ==
+# == useway 2 ==
 frames = [load_image(file) for file in os.listdir(FOLDER)];
 write_images_to_gif(frames, "output.gif", DURATION, LOOP):
 
