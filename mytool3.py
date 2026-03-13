@@ -1,4 +1,4 @@
-PROGRAM_VERSION = "3.1.1"
+PROGRAM_VERSION = "3.1.2"
 
 # == library ==
 
@@ -1028,7 +1028,7 @@ def plot_bar(**args):
 
 __all__ = [method for method in globals().keys()
 	if method not in [
-		"_io", "importlib", ""
+		"_io", "importlib", "subprocess", "fnmatch", "time",
 		"cv2", "pil_image", "numpy", "pytube", "pydub", "tkinter_filedialog", "googletrans", "translator", "clipboard", "pd",
 		"clear_t", "chdir_t", "list_dir_t", "list_tree_t"
 	]
