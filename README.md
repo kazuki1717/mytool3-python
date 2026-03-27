@@ -23,12 +23,12 @@ from mytool3 import *
 
 ## Methods
 
-**list_object_methods()**
+### show_object_methods()
 
 list `object` all method name, colored and order by method type, also shows their value if possible
 
 ```python
-def list_object_methods(object, findname: str = "", details: bool = True, colors: bool = True) -> None:
+def show_object_methods(object, findname: str = "", details: bool = True, colors: bool = True) -> None:
   pass
 ```
 - object : a variable you want to know
@@ -37,7 +37,7 @@ def list_object_methods(object, findname: str = "", details: bool = True, colors
 - colors : will the list content colored by method type (False would faster)
 
 
-**clear**
+### clear
 
 clear terminal text
 
@@ -48,7 +48,7 @@ cls    # alias of clear
 ```
 
 
-**chdir**
+### chdir
 
 show/change working directory
 
@@ -58,7 +58,7 @@ chdir(dest)    # change working directory to dest
 ```
 
 
-**list_dir**
+### list_dir
 
 show directory files
 
@@ -68,7 +68,7 @@ list_dir(path)  # show all files in path
 ```
 
 
-**list_tree**
+### list_tree
 
 ```python
 list_tree        # show files tree in current directory
@@ -76,7 +76,7 @@ list_tree(path)  # show files tree in path
 ```
 
 
-**load_video()**
+### load_video()
 
 load opencv2.VideoCapture from file path or explorer select
 
@@ -88,7 +88,7 @@ video: cv2.VideoCapture = load_video();      # ask user file by open an exploer 
 - path : video path in str, or open explorer to select if None
 
 
-**play_video()**
+### play_video()
 
 play video in new monitor
 
@@ -99,11 +99,12 @@ def play_video(video: str | None | cv2.VideoCapture = None) -> None:
 - video : to play in display, you can put video object, file name or None to open explorer selecting
 
 
-**get_video_...(video)**
+### get_video_...(video)
 
 get video information
 
 ```python
+POSITION  = get_video_pos(video)
 WIDTH     = get_video_width(video)
 HEIGHT    = get_video_height(video)
 FPS       = get_video_fps(video)
@@ -111,7 +112,7 @@ DURATION  = get_video_duration(video)
 ```
 
 
-**is_valid_video()**
+### is_valid_video()
 
 is the video vaild
 
@@ -121,22 +122,37 @@ valid = is_valid_video(video);
 - video : cv2.VideoCapture
 
 
-**write_images_to_gif()**
+### write_mp4()
 
-make GIF
+write mp4 file
+
+**usage**
+
+```python
+
+```
+
+### write_gif()
+
+write GIF file
+
+**usage**
 
 ```python
 # == constants ==
-FOLDER = "frames/";
-DURATION = 1000 / 25;
-LOOP = 0;
+OUTPUT = "output.gif"
+DURATION = 1000 / 25
+LOOP = 0
 
 # == useway 1 ==
-write_images_to_gif(FOLDER, "output.gif", DURATION, LOOP);
+write_gif("frames/", OUTPUT, DURATION, LOOP)
 
 # == useway 2 ==
-frames = [load_image(file) for file in os.listdir(FOLDER)];
-write_images_to_gif(frames, "output.gif", DURATION, LOOP):
+frames = [load_image(file) for file in os.listdir(FOLDER)]
+write_gif(frames, OUTPUT, DURATION, LOOP)
+
+# == useway 3 ==
+write_gif("sample.mp4", OUTPUT, DURATION, LOOP)
 
 ```
 - frames : GIF frames, it could be a directory path storing frames or image list

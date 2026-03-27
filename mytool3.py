@@ -105,6 +105,103 @@ def ask_file(file_types: list[tuple[str, str]] = [("All Files", "*")]) -> str:
 
 
 
+# == OS / terminal ==
+
+is_file = os.path.isfile
+is_dir = os.path.isdir
+
+
+class clear_t:
+    def __repr__(self):
+        self.clear()
+        return ""
+    def __call__(self):
+        self.clear()
+    
+    def clear(self):
+        if (IS_WIN):
+            os.system("cls")
+        else:
+            print("\x1b[2J\x1b[00H", end = "")
+        return ""
+
+cls = CLS = clear = CLEAR = clear_t()
+
+
+
+class chdir_t:
+    def __repr__(self):
+        return os.getcwd()
+    def __call__(self, path = ""):
+        self.set(path)
+
+    def set(self, path = ""):
+        if (not path):
+            return
+        try:
+            os.chdir(path)
+        except FileNotFoundError:
+            print("ERROR: chdir: Couldn't find path!")
+
+cd = chdir = chdir_t()
+
+
+
+class list_dir_t:
+	def __repr__(self):
+		self.listdir()
+		return ""
+	def __call__(self, path = ""):
+		self.listdir(path)
+
+	def listdir(self, path = ""):
+		os.system(("dir " if IS_WIN else "ls ") + ('"' + path + '"' if (path) else ""))
+
+ls = list_dir = list_dir_t()
+
+
+
+
+class list_tree_t:
+	def __repr__(self):
+		self.list_tree()
+		return ""
+
+	def __call__(self, top = os.curdir, patterns = ("*")):
+		self.list_tree(top, patterns)
+
+	def list_tree(top = os.curdir, patterns = ("*")):
+		topLength = len(top)
+		
+		for r, ds, fs in os.walk(top):
+			totalSpace = r[topLength:].count(os.sep)
+			
+			files = [fn for pattern in patterns for fn in fnmatch.filter(fs, pattern)]
+			
+			if (files and r != top):
+				print(f"\x1b[1m{r[topLength+1:]}{os.sep}\x1b[0m")
+			
+			for fn in files:
+				print("\t" * totalSpace + fn)
+
+
+list_tree = list_tree_t()
+
+
+
+def touch(files: str, *others: list[str]):
+	# Touch files input by multi-line or path split text
+	for filename in [fn for fn in files.split('\n') for fn in fn.split(os.pathsep)]:
+		if (filename and not os.path.exists(filename)):
+			open(filename, "x")
+	
+	# Touch files input by multi-args
+	for filename in others:
+		if (filename and type(filename) == str and not os.path.exists(filename)):
+			open(filename, "x")
+
+
+
 # ==== video ====
 
 # == load ==
@@ -114,24 +211,23 @@ def load_video(object = None):
 	
 	- object (cv2.VideoCapture) : return object
 	- object (str) : load video from object
-	- object (None) : 
+	- object (None) : provide explorer to select video file and load it
 	"""
 	global cv2
 	cv2 = load_library(cv2, "cv2", "opencv-python")
 
-	type_file = type(object)
+	object_type = type(object)
 
-	if (type_file == cv2.VideoCapture):
+	if (object_type == cv2.VideoCapture):
 		return object
 
-	if (type_file == str):
+	if (object_type == str):
 		return cv2.VideoCapture(object)
 
 	if (object == None):
 		return cv2.VideoCapture(ask_file([("Video files", "*.mp4 *.webm *.avi *.mov *.wmv *.flv"), ("All files", "*.*")]))
 
-	print("ERROR: load_video: invalid input type " + type_file.__name__)
-	return None
+	raise Exception(f"invalid input type {object_type.__name__}")
 
 
 # == get ==
@@ -309,6 +405,34 @@ def play_video(video = None, window_name: str = "play_video", fullscreen: bool =
 
 
 
+# == to ==
+
+def to_cv2_image_list(video):
+	video = load_video(video)
+
+	frames = []
+	while (True):
+		ret, frame = video.read()
+		if (ret == False):
+			break
+		frames.append(frame)
+	return frames
+
+def to_pil_image_list(video):
+	video = load_video(video)
+
+	frames = []
+	while (True):
+		ret, frame = video.read()
+		if (ret == False):
+			break
+		frames.append(to_pil_image(frame))
+	return frames
+
+
+
+
+
 
 # == write ==
 
@@ -382,191 +506,117 @@ def to_pil_image(image):
 
 # == load ==
 
-def load_image(file: str|None = None):
+def load_cv2_image(object: str|None = None):
 	global pil_image, numpy, cv2
 	pil_image = load_library(pil_image, "PIL.Image", "pillow")
 	cv2 = load_library(cv2, "cv2", "opencv-python")
 
-	type_file = type(file)
-	if (type_file.__name__ == "numpy.ndarray"):
-		return file
+	object_type = type(object)
+	if (object_type.__name__ == "numpy.ndarray"):
+		return object
 
-	if (type_file == str):
-		return cv2.imread(file)
+	if (object_type == str):
+		return cv2.imread(object)
 
-	if (is_pil_image(file)):
-		return to_cv2_image(file)
+	if (is_pil_image(object)):
+		return to_cv2_image(object)
 
-	if (file == None):
+	if (object == None):
 		return cv2.imread(ask_file([("Image file", ".png *jpg *.jpeg *.ico"), ("All files", "*.*")]))
 
-	print(f"ERROR: load_image: invaild input type {type_file.__name__}!")
+	raise Exception(f"invaild type {object_type.__name__}!")
 
 
 
-def get_image_size(image) -> tuple[int, int, int]:
+def get_image_size(image) -> tuple[int, int]:
 	if (is_pil_image(image)):
 		return image.size
 
-	return load_image(image).shape[0:2]
-
+	image = load_cv2_image(image)
+	return [image.shape[1], image.shape[0]]
 
 
 def show_image(file: str|None = None, window_name: str = "imshow"):
-	image = load_image(file)
-	cv2.imshow(window_name, image)
+	cv2.imshow(window_name, load_cv2_image(file))
 
 
 
 
 # == GIF ==
 
-def write_gif(frames: list|str, output: str, duration: int, loop: int = 0):
+def write_gif(object: list|str, output: str, duration: int = 0, loop: int = 0):
 	global pil_image, cv2
 	pil_image = load_library(pil_image, "PIL.Image", "pillow")
 
-	frames_real = []
+	# == convert object to pil_image list ==
 
-	if (type(frames) == str):
-		for file in os.listdir(frames):
-			if (not file.rsplit('.', 1)[1] in ("png", "jpg", "jpeg")):
+	frames = []
+	object_type = type(object)
+
+	if (object_type == str and is_file(object)):
+		video = load_video(object)
+		frames = to_pil_image_list(video)
+
+		if (duration == 0):
+			duration = get_video_duration(video)
+	
+	elif (object_type == str and is_dir(object)):
+		if (duration == 0):
+			raise TypeError("missing 1 required positional argument: 'duration'")
+
+		for file in os.listdir(object):
+			if (file.rsplit(os.extsep, 1)[1] not in ("png", "jpg", "jpeg")):
 				continue
 			
-			frames_real.append(pil_image.open(frames + os.sep + file))
+			frames.append(pil_image.open(object + os.sep + file))
 
-	elif (type(frames) == list):
-		for frame in frames:
+	elif (object_type == str):
+		raise FileNotFoundError(f"{object} not exist")
+
+	elif (object_type == list):
+		if (duration == 0):
+			raise TypeError("missing 1 required positional argument: 'duration'")
+
+		for frame in object:
 			if (type(frame).__name__ == "numpy.ndarray"):
-				frames_real.append(to_pil_image(frame))
+				frames.append(to_pil_image(frame))
 				continue
 		
-			frames_real.append(frame)
+			frames.append(frame)
 
+	elif (object_type == cv2.VideoCapture):
+		if (duration == 0):
+			duration = get_video_duration(object)
 
-		frames_real = frames
+		frames = to_pil_image_list(object)
 
 	else:
-		raise Exception()
+		raise Exception(f"Invalid object type {object_type.__name__}")
 
 
-	frames_real[0].save(output, save_all=True, append_images=frames_real[1:], duration=int(duration), loop=loop)
+	# == write ==
 
+	def write_gif_thread(output, frames, duration, loop):
+		frames[0].save(output, save_all=True, append_images=frames[1:], duration=duration, loop=loop)
 
-
-
-
-
-# == OS / terminal ==
-
-class clear_t:
-    def __repr__(self):
-        self.clear()
-        return ""
-    def __call__(self):
-        self.clear()
-    
-    def clear(self):
-        if (IS_WIN):
-            os.system("cls")
-        else:
-            print("\x1b[2J\x1b[00H", end = "")
-        return ""
-
-cls = CLS = clear = CLEAR = clear_t()
-
-
-
-class chdir_t:
-    def __repr__(self):
-        return os.getcwd()
-    def __call__(self, path = ""):
-        self.set(path)
-
-    def set(self, path = ""):
-        if (not path):
-            return
-        try:
-            os.chdir(path)
-        except FileNotFoundError:
-            print("ERROR: chdir: Couldn't find path!")
-
-cd = chdir = chdir_t()
-
-
-
-class list_dir_t:
-	def __repr__(self):
-		self.listdir()
-		return ""
-	def __call__(self, path = ""):
-		self.listdir(path)
-
-	def listdir(self, path = ""):
-		os.system(("dir " if IS_WIN else "ls ") + ('"' + path + '"' if (path) else ""))
-
-ls = list_dir = list_dir_t()
-
-
-
-
-class list_tree_t:
-	def __repr__(self):
-		self.list_tree()
-		return ""
-
-	def __call__(self, top = os.curdir, patterns = ("*")):
-		self.list_tree(top, patterns)
-
-	def list_tree(top = os.curdir, patterns = ("*")):
-		topLength = len(top)
-		
-		for r, ds, fs in os.walk(top):
-			totalSpace = r[topLength:].count(os.sep)
-			
-			files = [fn for pattern in patterns for fn in fnmatch.filter(fs, pattern)]
-			
-			if (files and r != top):
-				print(f"\x1b[1m{r[topLength+1:]}{os.sep}\x1b[0m")
-			
-			for fn in files:
-				print("\t" * totalSpace + fn)
-
-
-list_tree = list_tree_t()
-
-
-
-
-
-def touch(files: str, *others: list[str]):
-	# Touch files input by multi-line or path split text
-	for filename in [fn for fn in files.split('\n') for fn in fn.split(os.pathsep)]:
-		if (filename and not os.path.exists(filename)):
-			open(filename, "x")
-	
-	# Touch files input by multi-args
-	for filename in others:
-		if (filename and type(filename) == str and not os.path.exists(filename)):
-			open(filename, "x")
-
-
-
-
+	Thread(target = write_gif_thread, args=[output, frames, int(duration), loop]).start()
+	print(f"INFO: start writing {output}")
 
 
 
 # ==== audio ====
 
-def write_mp3(file: str, dest: str):
+def write_mp3(file: str, output: str):
     load_library(None, None, "ffmpeg")
     global pydub
     pydub = load_library(pydub, "pydub")
 
-    def convert(file, dest):
+    def write_mp3_thread(file, dest):
         audio = pydub.AudioSegment.from_file(file)
         audio.export(dest, format = "mp3")
 
-    Thread(target = convert, args = [file, dest]).start()
+    Thread(target = write_mp3_thread, args = [file, output]).start()
+    print(f"INFO: start writing {output}")
 
 
 def download_youtube(url: str, dl_type: str = "video"):
