@@ -9,8 +9,8 @@ First, make sure you have installed python in version 3. Then, download this pac
 Or you can run this command to install
 
 ```
-git clone https://github.com/kazuki-256/mytool
-py mytool/make_mytool3.py
+git clone https://github.com/kazuki1717/mytool3-python
+py mytool3-python/add_mytool3.py
 ```
 
 ## Suggest to import
@@ -39,12 +39,12 @@ def list_object_methods(object, findname: str = "", details: bool = True, colors
 
 **clear**
 
-clear terminal, just `clear`
+clear terminal text
 
 usage:
 ```python
-clear    // no () needed
-cls()    // alias of clear
+clear    # no () needed
+cls    # alias of clear
 ```
 
 
@@ -53,8 +53,8 @@ cls()    // alias of clear
 show/change working directory
 
 ```python
-chdir          // show current path, no () needed
-chdir(dest)    // change working directory to dest
+chdir          # print current path, no () needed
+chdir(dest)    # change working directory to dest
 ```
 
 
@@ -63,16 +63,16 @@ chdir(dest)    // change working directory to dest
 show directory files
 
 ```python
-list_dir        // show all files in current directory
-list_dir(path)  // show all files in path
+list_dir        # show all files in current directory
+list_dir(path)  # show all files in path
 ```
 
 
 **list_tree**
 
 ```python
-list_tree        // show files tree in current directory
-list_tree(path)  // show files tree in path
+list_tree        # show files tree in current directory
+list_tree(path)  # show files tree in path
 ```
 
 
@@ -81,8 +81,9 @@ list_tree(path)  // show files tree in path
 load opencv2.VideoCapture from file path or explorer select
 
 ```python
-def load_video(path: str | None = None) -> cv2.VideoCapture:
-  pass
+video: cv2.VideoCapture = load_video(path);  # open file in `path`
+
+video: cv2.VideoCapture = load_video();      # ask user file by open an exploer and open it
 ```
 - path : video path in str, or open explorer to select if None
 
@@ -98,7 +99,7 @@ def play_video(video: str | None | cv2.VideoCapture = None) -> None:
 - video : to play in display, you can put video object, file name or None to open explorer selecting
 
 
-**get_video_...()**
+**get_video_...(video)**
 
 get video information
 
@@ -115,8 +116,7 @@ DURATION  = get_video_duration(video)
 is the video vaild
 
 ```python
-def is_valid_video(video: cv2.VideoCapture) -> bool:
-  pass
+valid = is_valid_video(video);
 ```
 - video : cv2.VideoCapture
 
@@ -126,14 +126,23 @@ def is_valid_video(video: cv2.VideoCapture) -> bool:
 make GIF
 
 ```python
-def write_images_to_gif(frames: str | list[PIL.Image | numpy.ndarray],
-                        output: str, duration: int, loop: int = 0):
-  pass
+# == constants ==
+FOLDER = "frames/";
+DURATION = 1000 / 25;
+LOOP = 0;
+
+# == useway 1 ==
+write_images_to_gif(FOLDER, "output.gif", DURATION, LOOP);
+
+# == useway 2 ==
+frames = [load_image(file) for file in os.listdir(FOLDER)];
+write_images_to_gif(frames, "output.gif", DURATION, LOOP):
+
 ```
 - frames : GIF frames, it could be a directory path storing frames or image list
 - output : ouput GIF name
 - duration : every frame time to next frame
-- loop : how many times the GIF will loops, zero mean infine
+- loop : how many times the GIF will loops, default: 0 (mean infine)
 
 
 
