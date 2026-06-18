@@ -14,6 +14,11 @@ url: https://github.com/kazuki-1717/mytool3-python
 
 import module when use, also install library if module not installed
 
+features:
+- autoly download module from network
+- background import module
+
+
 usage:
 ```
 module = lazy_import(
