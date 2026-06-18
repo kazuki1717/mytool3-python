@@ -1,7 +1,7 @@
 # samples of lazy_import usage
 # from lazy_import_examples import *
 
-from lazy_import import *
+from lazy_import import lazy_import
 
 
 cv2 = lazy_import("cv2", "opencv-python")
