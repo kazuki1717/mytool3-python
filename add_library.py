@@ -13,3 +13,9 @@ for file in FILES:
 
     dest_file.close();
     code_file.close();
+
+print("files copying are done!")
+print("exit after 1 second...")
+
+from time import sleep
+sleep(1);

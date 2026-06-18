@@ -1091,5 +1091,5 @@ __all__ = [
 			"clear_t", "chdir_t", "listdir_t", "list_tree_t",
 
 			"time", "tkinter_filedialog", "translator"
-		] + lazy_import.registered
+		]
 ]
